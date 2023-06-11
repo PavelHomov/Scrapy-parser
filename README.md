@@ -14,4 +14,4 @@
 
 ## Автор
 
-Павел Хомов
+[Павел Хомов](https://github.com/PavelHomov)

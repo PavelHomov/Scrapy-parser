@@ -1,39 +1,39 @@
-import datetime as dt
+from datetime import datetime as dt
+from collections import defaultdict
+from csv import QUOTE_NONE, unix_dialect, writer
 from pathlib import Path
 
-from .exceptions import NoStatusException
+from .settings import RESULTS
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).parent.parent
+
+RESULTS_DIR = BASE_DIR / RESULTS
 
 DATETIME_FORMAT = '%Y-%m-%d_%H-%M-%S'
+
+FILE_NAME = 'status_summary_{}.csv'
 
 
 class PepParsePipeline():
 
-    def __init__(self) -> None:
-        self.results_dir = BASE_DIR / 'results'
-        self.results_dir.mkdir(parents=True, exist_ok=True)
+    def __init__(self):
+        RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     def open_spider(self, spider):
-        self.results_data = {}
+        self.counter = defaultdict(int)
 
     def process_item(self, item, spider):
-        try:
-            status = item['status']
-            self.results_data[status] = self.results_data.get(status, 0) + 1
-            return item
-        except NoStatusException:
-            number = item['number']
-            print(f'PEP {number}. Нет статуса.')
+        self.counter[item['status']] += 1
+        return item
 
     def close_spider(self, spider):
-        now = dt.datetime.now()
-        now_formatted = now.strftime(DATETIME_FORMAT)
-        file_name = f'{self.results_dir}/status_summary_{now_formatted}.csv'
-        total = 0
-        with open(file_name, mode='w', encoding='utf-8') as f:
-            f.write('Статус, Количество\n')
-            for key, value in self.results_data.items():
-                total += int(value)
-                f.write(f'{key}, {value}\n')
-            f.write(f'Total, {total}\n')
+        with open(
+            RESULTS_DIR / FILE_NAME.format(dt.now().strftime(DATETIME_FORMAT)),
+            mode='w',
+            encoding='utf-8',
+        ) as f:
+            writer(f, dialect=unix_dialect, quoting=QUOTE_NONE).writerows([
+                ('Status', 'Count'),
+                *self.counter.items(),
+                ('Total', sum(self.counter.values()))
+            ])
