@@ -30,7 +30,9 @@ class PepParsePipeline():
 
     def close_spider(self, spider):
         with open(
-            self.results / FILE_NAME.format(dt.now().strftime(DATETIME_FORMAT)),
+            self.results / FILE_NAME.format(
+                dt.now().strftime(DATETIME_FORMAT)
+            ),
             mode='w',
             encoding='utf-8',
         ) as f:
