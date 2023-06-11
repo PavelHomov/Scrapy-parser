@@ -7,7 +7,7 @@ from .settings import RESULTS
 
 BASE_DIR = Path(__file__).parent.parent
 
-RESULTS_DIR = BASE_DIR / RESULTS
+# RESULTS_DIR = BASE_DIR / RESULTS
 
 DATETIME_FORMAT = '%Y-%m-%d_%H-%M-%S'
 
@@ -17,7 +17,9 @@ FILE_NAME = 'status_summary_{}.csv'
 class PepParsePipeline():
 
     def __init__(self):
-        RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+        self.results = BASE_DIR / RESULTS
+        self.results.mkdir(exist_ok=True)
+        # RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     def open_spider(self, spider):
         self.counter = defaultdict(int)
@@ -28,7 +30,7 @@ class PepParsePipeline():
 
     def close_spider(self, spider):
         with open(
-            RESULTS_DIR / FILE_NAME.format(dt.now().strftime(DATETIME_FORMAT)),
+            self.results / FILE_NAME.format(dt.now().strftime(DATETIME_FORMAT)),
             mode='w',
             encoding='utf-8',
         ) as f:
