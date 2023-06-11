@@ -1,6 +1,6 @@
-from datetime import datetime as dt
 from collections import defaultdict
 from csv import QUOTE_NONE, unix_dialect, writer
+from datetime import datetime as dt
 from pathlib import Path
 
 from .settings import RESULTS
